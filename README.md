@@ -1,7 +1,40 @@
-# Tauri + React + Typescript
+# Code Snippets Manager
 
-This template should help get you started developing with Tauri, React and Typescript in Vite.
+This is an application developed using Tauri, React, and TypeScript. It allows users to organize their code snippets into groups and collections, with each snippet having a title, description, and the ability to contain multiple files or manually entered pieces of text.
 
-## Recommended IDE Setup
+![Thumbnail image](/resources/thumbnail.png)
 
-- [VS Code](https://code.visualstudio.com/) + [Tauri](https://marketplace.visualstudio.com/items?itemName=tauri-apps.tauri-vscode) + [rust-analyzer](https://marketplace.visualstudio.com/items?itemName=rust-lang.rust-analyzer)
+## Features
+
+- Create and manage groups to organize collections of code snippets.
+- Each collection can contain multiple code snippets with customizable titles and descriptions.
+- Support for editing, renaming, and deleting snippets within collections.
+- Intuitive user interface powered by React for smooth interaction.
+
+## Why no executable file?
+
+Currently, the application is in development stage with potential bugs and incomplete features. The absence of an executable ensures that users get a stable version once all major issues are resolved before a release.
+
+## Group and Collection System
+
+The group and collection system is designed for future expansion. It paves the way for planned features like peer-to-peer collaboration, enabling users to share groups and collections with other users seamlessly.
+
+## Known Issues
+
+- Deleting a snippet may sometimes result in the entire snippet list becoming empty. This is a known bug and will be addressed in future updates.
+
+## Getting Started
+
+To run the application locally, follow these steps:
+
+1. Clone the repository.
+2. Install dependencies using `npm install`.
+3. Start the development server using `npm run tauri dev`.
+
+## Contributing
+
+Contributions are welcome! If you find any issues or have suggestions for improvement, please open an issue or submit a pull request.
+
+## License
+
+This project is licensed under the MIT License - see the [LICENSE](LICENSE) file for details.
