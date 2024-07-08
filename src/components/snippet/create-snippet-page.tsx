@@ -70,6 +70,7 @@ const CreateSnippetPage: React.FC = () => {
         const snippets = [...files.map(file => file.content), ...manualEntries];
 
         await invoke('create_snippet', {
+            groupName: selectedGroup?.name,
             collectionName: selectedCollection?.name,
             snippetName: name,
             description,

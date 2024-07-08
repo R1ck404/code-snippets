@@ -143,16 +143,26 @@ fn get_collection(name: &str, state: State<'_, AppState>) -> Option<Collection> 
 }
 
 #[tauri::command]
-fn delete_collection(name: &str, state: State<'_, AppState>) -> String {
-    let mut collections = state.collections.lock().unwrap();
-    
-    if !collections.contains_key(name) {
-        return format!("Error: Collection '{}' not found.", name);
+fn delete_collection(group_name: &str, collection_name: &str, state: State<'_, AppState>) -> String {
+    let mut groups = state.groups.lock().unwrap();
+
+    if let Some(group) = groups.get_mut(group_name) {
+        let mut collections = state.collections.lock().unwrap();
+        
+        if let Some(collection) = collections.get(collection_name) {
+            if collection.groups.iter().any(|g| g.name == group_name) {
+                collections.remove(collection_name);
+                save_collections(&collections, &app_data_dir());
+                return format!("Collection '{}' deleted from group '{}'", collection_name, group_name);
+            } else {
+                return format!("Error: Collection '{}' is not part of group '{}'.", collection_name, group_name);
+            }
+        } else {
+            return format!("Error: Collection '{}' not found.", collection_name);
+        }
+    } else {
+        return format!("Error: Group '{}' not found.", group_name);
     }
-    
-    collections.remove(name);
-    save_collections(&collections, &app_data_dir());
-    format!("Collection deleted: {}", name)
 }
 
 #[tauri::command]
@@ -241,6 +251,7 @@ fn app_data_dir() -> String {
 
 #[tauri::command]
 fn create_snippet(
+    group_name: &str,
     collection_name: &str,
     snippet_name: &str,
     description: &str,
@@ -249,27 +260,69 @@ fn create_snippet(
     updated_at: &str,
     state: State<'_, AppState>
 ) -> String {
-    let mut collections = state.collections.lock().unwrap();
-    
-    if let Some(collection) = collections.get_mut(collection_name) {
-        if collection.snippets.iter().any(|snippet| snippet.name == snippet_name) {
-            return format!("Error: A snippet with the name '{}' already exists in the collection '{}'.", snippet_name, collection_name);
-        }
+    let groups = state.groups.lock().unwrap();
 
-        let snippet = CodeSnippet {
-            name: snippet_name.to_string(),
-            description: description.to_string(),
-            files,
-            updated_by: updated_by.to_string(),
-            updated_at: updated_at.to_string(),
-        };
-
-        collection.snippets.push(snippet);
-        save_collections(&collections, &app_data_dir());
+    if let Some(group) = groups.get(group_name) {
+        let mut collections = state.collections.lock().unwrap();
         
-        format!("Snippet created: {}", snippet_name)
+        if let Some(collection) = collections.get_mut(collection_name) {
+            if collection.groups.iter().any(|g| g.name == group_name) {
+                if collection.snippets.iter().any(|snippet| snippet.name == snippet_name) {
+                    return format!("Error: A snippet with the name '{}' already exists in the collection '{}'.", snippet_name, collection_name);
+                }
+
+                let snippet = CodeSnippet {
+                    name: snippet_name.to_string(),
+                    description: description.to_string(),
+                    files,
+                    updated_by: updated_by.to_string(),
+                    updated_at: updated_at.to_string(),
+                };
+
+                collection.snippets.push(snippet);
+                save_collections(&collections, &app_data_dir());
+                
+                format!("Snippet created: {}", snippet_name)
+            } else {
+                format!("Error: Collection '{}' is not part of group '{}'.", collection_name, group_name)
+            }
+        } else {
+            format!("Error: Collection '{}' not found.", collection_name)
+        }
     } else {
-        format!("Error: Collection '{}' not found.", collection_name)
+        format!("Error: Group '{}' not found.", group_name)
+    }
+}
+
+#[tauri::command]
+fn delete_snippet(
+    group_name: &str,
+    collection_name: &str,
+    snippet_name: &str,
+    state: State<'_, AppState>
+) -> String {
+    let groups = state.groups.lock().unwrap();
+
+    if let Some(group) = groups.get(group_name) {
+        let mut collections = state.collections.lock().unwrap();
+        
+        if let Some(collection) = collections.get_mut(collection_name) {
+            if collection.groups.iter().any(|g| g.name == group_name) {
+                if let Some(index) = collection.snippets.iter().position(|snippet| snippet.name == snippet_name) {
+                    collection.snippets.remove(index);
+                    save_collections(&collections, &app_data_dir());
+                    format!("Snippet '{}' deleted from collection '{}' in group '{}'", snippet_name, collection_name, group_name)
+                } else {
+                    format!("Error: Snippet '{}' not found in collection '{}'.", snippet_name, collection_name)
+                }
+            } else {
+                format!("Error: Collection '{}' is not part of group '{}'.", collection_name, group_name)
+            }
+        } else {
+            format!("Error: Collection '{}' not found.", collection_name)
+        }
+    } else {
+        format!("Error: Group '{}' not found.", group_name)
     }
 }
 
@@ -296,7 +349,8 @@ fn main() {
             get_collection,
             delete_collection,
             rename_collection,
-            create_snippet
+            create_snippet,
+            delete_snippet
         ])
         .run(tauri::generate_context!())
         .expect("error while running tauri application");

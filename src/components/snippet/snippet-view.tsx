@@ -1,22 +1,85 @@
-import { useAppState } from "../../context/AppStateContext";
+import { useState } from "react";
+import { Collection, useAppState } from "../../context/AppStateContext";
 import { Avatar } from "../avatar/avatar";
 import CodeEditor from "../code-editor/code-editor";
+import { Dropdown, DropdownTrigger, DropdownMenu, DropdownSection, DropdownLabel, DropdownHeading, DropdownDivider, DropdownItem } from "../dropdown/dropdown";
 import { Separator } from "../separator/separator";
 import { toast } from "../toaster/toaster";
+import { invoke } from "@tauri-apps/api/tauri";
+import { Alert, AlertTitle, AlertDescription, AlertActions } from "../alert/alert";
+import Button from "../button/button";
+import { emit, listen } from '@tauri-apps/api/event'
 
 export default function SnippetView() {
-    const { selectedSnippet } = useAppState();
+    const [menuOpen, setMenuOpen] = useState(false);
+    const { selectedSnippet, setSelectedSnippet, selectedCollection, selectedGroup, setCollections } = useAppState();
+    const [currentSnippetAction, setCurrentSnippetAction] = useState<string>('');
+
+    const setIsOpen = (isOpen: boolean) => {
+        setCurrentSnippetAction('');
+    }
+
+    const updateCollections = async () => {
+        const collections = await invoke('get_collections');
+
+        setCollections(collections as Collection[]);
+        console.log(collections);
+    }
+
+    const deleteSnippet = async (snippetName: string) => {
+        setIsOpen(false);
+        await invoke('delete_snippet', { groupName: selectedGroup?.name, collectionName: selectedCollection?.name, snippetName: snippetName }).then((e) => {
+            if (e && (e as string).startsWith('Error')) {
+                toast.error(e as string);
+                return;
+            }
+
+            setSelectedSnippet(null);
+            toast.success('Snippet deleted successfully');
+            updateCollections();
+            emit('app://refresh_snippets', {});
+            emit('app://delete_snippet', {
+                groupName: selectedGroup?.name,
+                collectionName: selectedCollection?.name,
+                snippetName: snippetName
+            });
+        });
+    }
 
     return (
         <div className="flex flex-col w-full h-full p-5">
             {selectedSnippet ? (
                 <div className="overflow-x-hidden scrollbar-thin scrollbar-thumb-zinc-600 scrollbar-thumb-rounded-full scrollbar-track-zinc-800">
+                    <Alert open={currentSnippetAction !== ''} onClose={setIsOpen} outline={false} className='text-white'>
+                        <AlertTitle>Are you sure</AlertTitle>
+                        <AlertDescription>
+                            Are you sure you want to delete this snippet? This action cannot be undone.
+                        </AlertDescription>
+                        <AlertActions>
+                            <Button variant="ghost" onClick={() => setIsOpen(false)}>Cancel</Button>
+                            <Button variant="default" color='rose' onClick={() => deleteSnippet(selectedSnippet.name)}>Delete</Button>
+                        </AlertActions>
+                    </Alert>
                     <div className="w-full flex items-center justify-between">
                         <h1 className="font-bold text-xl text-white">{selectedSnippet.name}</h1>
-                        <svg height="16" strokeLinejoin="round" viewBox="0 0 16 16" width="16">
-                            <path clipRule="evenodd" d="M4 8C4 8.82843 3.32843 9.5 2.5 9.5C1.67157 9.5 1 8.82843 1 8C1 7.17157 1.67157 6.5 2.5 6.5C3.32843 6.5 4 7.17157 4 8ZM9.5 8C9.5 8.82843 8.82843 9.5 8 9.5C7.17157 9.5 6.5 8.82843 6.5 8C6.5 7.17157 7.17157 6.5 8 6.5C8.82843 6.5 9.5 7.17157 9.5 8ZM13.5 9.5C14.3284 9.5 15 8.82843 15 8C15 7.17157 14.3284 6.5 13.5 6.5C12.6716 6.5 12 7.17157 12 8C12 8.82843 12.6716 9.5 13.5 9.5Z" fill="currentColor" fill-rule="evenodd">
+
+                        <Dropdown>
+                            <DropdownTrigger>
+                                <svg height="16" strokeLinejoin="round" viewBox="0 0 16 16" width="16" className="text-white cursor-pointer" onClick={() => setMenuOpen(!menuOpen)}>
+                                    <path clipRule="evenodd" d="M4 8C4 8.82843 3.32843 9.5 2.5 9.5C1.67157 9.5 1 8.82843 1 8C1 7.17157 1.67157 6.5 2.5 6.5C3.32843 6.5 4 7.17157 4 8ZM9.5 8C9.5 8.82843 8.82843 9.5 8 9.5C7.17157 9.5 6.5 8.82843 6.5 8C6.5 7.17157 7.17157 6.5 8 6.5C8.82843 6.5 9.5 7.17157 9.5 8ZM13.5 9.5C14.3284 9.5 15 8.82843 15 8C15 7.17157 14.3284 6.5 13.5 6.5C12.6716 6.5 12 7.17157 12 8C12 8.82843 12.6716 9.5 13.5 9.5Z" fill="currentColor" fillRule="evenodd">
                             </path>
                         </svg>
+                            </DropdownTrigger>
+                            <DropdownMenu isOpen={menuOpen} position='left'>
+                                <DropdownSection className="text-white">
+                                    <DropdownItem>Edit</DropdownItem>
+                                    <DropdownItem onClick={() => {
+                                        setMenuOpen(false);
+                                        setCurrentSnippetAction(selectedSnippet.name);
+                                    }}>Delete</DropdownItem>
+                                </DropdownSection>
+                            </DropdownMenu>
+                        </Dropdown>
                     </div>
                     <p className="text-zinc-500 text-sm">{selectedSnippet.files.length} file(s)</p>
                     <p className="text-zinc-500 mt-3">{selectedSnippet.description}</p>

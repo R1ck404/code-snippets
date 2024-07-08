@@ -8,6 +8,7 @@ import { Separator } from "../separator/separator";
 import { toast } from "../toaster/toaster";
 import { Alert, AlertTitle, AlertDescription, AlertActions } from "../alert/alert";
 import Button from "../button/button";
+import { emit, listen } from '@tauri-apps/api/event'
 
 export default function CollectionList() {
     const { collections, setCollections, selectedCollection, setSelectedCollection, selectedGroup } = useAppState();
@@ -35,7 +36,7 @@ export default function CollectionList() {
     }
 
     const deleteCollection = async (collectionName: string) => {
-        await invoke('delete_collection', { name: collectionName }).then((e) => {
+        await invoke('delete_collection', { groupName: selectedGroup?.name, collectionName: collectionName }).then((e) => {
             if (e && (e as string).startsWith('Error')) {
                 toast.error(e as string);
                 return;

@@ -2,6 +2,7 @@ import { useEffect, useState } from "react";
 import { useAppState } from "../../context/AppStateContext";
 import { Avatar } from "../avatar/avatar";
 import { differenceInMinutes, differenceInHours, differenceInDays } from 'date-fns';
+import { listen } from "@tauri-apps/api/event";
 
 function formatTimeAgo(timestamp: string): string {
     const date = new Date(timestamp);
@@ -24,11 +25,28 @@ function formatTimeAgo(timestamp: string): string {
 
 
 export default function SnippetList() {
-    const { groups, setGroups, selectedGroup, setSelectedGroup, selectedCollection, setSelectedCollection, selectedSnippet, setSelectedSnippet } = useAppState();
+    const { collections, selectedGroup, setSelectedGroup, selectedCollection, setSelectedCollection, selectedSnippet, setSelectedSnippet } = useAppState();
     const [snippets, setSnippets] = useState(selectedCollection ? selectedCollection.snippets : []);
 
     useEffect(() => {
-        setSnippets(selectedCollection ? selectedCollection.snippets : []);
+        const e = async () => {
+            listen('app://delete_snippet', async (snippet: any) => {
+                console.log("deleting snpt:", snippet);
+                const { groupName, collectionName, snippetName } = snippet.payload;
+
+                setSnippets(snippets.filter((s) => s.name !== snippetName));
+                // }
+            });
+        }
+
+        e();
+    }, []);
+
+    useEffect(() => {
+        console.log(selectedCollection);
+        if (selectedCollection) {
+            setSnippets(selectedCollection.snippets);
+        }
     }, [selectedCollection]);
 
     return (
@@ -38,12 +56,12 @@ export default function SnippetList() {
                     {selectedGroup && selectedCollection ? selectedCollection.name : 'No collection selected'}
                 </h1>
                 <p className="text-sm text-zinc-500">
-                    ({selectedGroup && selectedCollection ? selectedCollection.snippets.length : 0})
+                    ({selectedGroup && selectedCollection ? snippets.length : 0})
                 </p>
             </div>
 
             <ul className="flex flex-col space-y-1 mt-3">
-                {snippets.map((snippet, index) => {
+                {selectedGroup && selectedCollection && snippets.map((snippet, index) => {
                     const formattedTimeAgo = formatTimeAgo(snippet.updated_at);
                     return <li key={index} className={`flex text-white px-2 py-1.5 rounded-lg ${selectedSnippet && selectedSnippet.name === snippet.name ? 'bg-zinc-800' : ''} cursor-pointer`} onClick={() => setSelectedSnippet(snippet)}>
                         {/* <svg height="16" strokeLinejoin="round" viewBox="0 0 16 16" width="16">

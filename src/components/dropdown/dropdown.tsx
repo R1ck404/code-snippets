@@ -73,7 +73,7 @@ const DropdownMenu: React.FC<DropdownMenuProps> = ({ isOpen, children, position 
     }, [isOpen, calculatePosition]);
 
     const menuClasses = classNames(
-        'absolute w-48 bg-secondary text-color-secondary border border-border rounded-lg shadow-lg z-50 transition-all duration-250 scale-100 transform',
+        'absolute w-48 bg-zinc-700 text-color-secondary border border-border rounded-lg shadow-lg z-50 transition-all duration-250 scale-100 transform',
         {
             'opacity-100 visible scale-100': isOpen,
             'opacity-0 invisible scale-0': !isOpen,
@@ -99,7 +99,7 @@ interface DropdownItemProps {
 }
 
 const DropdownItem: React.FC<DropdownItemProps> = ({ href, onClick, children, className }) => {
-    const itemClasses = 'cursor-pointer m-1 rounded-md block px-3 py-1.5 text-sm text-color-default hover:bg-background ' + className ?? '';
+    const itemClasses = 'cursor-pointer m-1 rounded-md block px-3 py-1.5 text-sm text-color-default hover:bg-background ' + (className ?? '');
 
     if (href) {
         return (

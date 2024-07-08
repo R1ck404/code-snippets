@@ -12,7 +12,7 @@ import { Alert, AlertTitle, AlertDescription, AlertActions } from '../alert/aler
 import Button from '../button/button';
 import { toast } from '../toaster/toaster';
 export default function Sidebar() {
-    const { groups, setGroups, selectedGroup, setSelectedGroup } = useAppState();
+    const { groups, setGroups, selectedGroup, setSelectedGroup, setSelectedCollection } = useAppState();
     const [currentGroupAction, setCurrentGroupAction] = useState<string>('');
     const [profileMenuOpen, setProfileMenuOpen] = useState(false);
 
@@ -82,7 +82,10 @@ export default function Sidebar() {
                         <ContextMenu key={group.name}>
                             <ContextMenuTrigger>
 
-                                <div className={`rounded-lg flex items-end justify-end w-10 h-10 cursor-pointer ${selectedGroup && selectedGroup.name === group.name ? 'ring-2 ring-zinc-200' : ''}`} key={group.name} style={{ backgroundColor: stringToTailwindHex(group.color), color: textColor }} onClick={() => setSelectedGroup(group)}>
+                                <div className={`rounded-lg flex items-end justify-end w-10 h-10 cursor-pointer ${selectedGroup && selectedGroup.name === group.name ? 'ring-2 ring-zinc-200' : ''}`} key={group.name} style={{ backgroundColor: stringToTailwindHex(group.color), color: textColor }} onClick={() => {
+                                    setSelectedGroup(group)
+                                    setSelectedCollection(null)
+                                }}>
                                     <p className='font-bold mr-1.5'>{group.name.charAt(0).toUpperCase() + group.name.slice(1, 2)}</p>
                                 </div>
                             </ContextMenuTrigger>
@@ -111,8 +114,8 @@ export default function Sidebar() {
                             <DropdownLabel className="text-nowrap w-fit px-2">Logged in as</DropdownLabel>
                             <DropdownHeading className="font-semibold !pt-0">Not supported</DropdownHeading>
                         </DropdownSection>
-                        <DropdownDivider className="w-[90%] border-zinc-700 mx-auto !my-0" />
-                        <DropdownSection>
+                        <DropdownDivider className="w-[90%] mx-auto !my-0" />
+                        <DropdownSection className='text-white'>
                             <DropdownItem>Share session</DropdownItem>
                             <DropdownItem>My profile</DropdownItem>
                             <DropdownItem >Logout</DropdownItem>
