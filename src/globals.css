@@ -1,0 +1,86 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+
+:root {
+    --color-background: var(--color-background-light);
+    --color-text: var(--color-text-light);
+    --color-text-color-secondary: var(--color-text-lighter);
+    --color-primary: var(--color-primary-light);
+    --color-secondary: var(--color-secondary-light);
+    --color-accent: var(--color-accent-light);
+    --color-border: var(--color-border-light);
+    --color-link: var(--color-link-light);
+
+    --color-background-light: #ffffff;
+    --color-text-light: #212529;
+    --color-text-lighter: #495057;
+    --color-primary-light: #007bff;
+    --color-secondary-light: #f4f4f6;
+    --color-accent-light: #ffc107;
+    --color-border-light: #e9ecef;
+    --color-link-light: #007bff;
+
+    --color-background-dark: #1a1a1a;
+    --color-text-dark: #f8f9fa;
+    --color-text-darker: #ced4da;
+    --color-primary-dark: #0d6efd;
+    --color-secondary-dark: #262628;
+    --color-accent-dark: #ffc107;
+    --color-border-dark: #495057;
+    --color-link-dark: #66b2ff;
+}
+
+[data-theme="dark"],
+.dark {
+    --color-background: var(--color-background-dark);
+    --color-text: var(--color-text-dark);
+    --color-text-color-secondary: var(--color-text-darker);
+    --color-primary: var(--color-primary-dark);
+    --color-secondary: var(--color-secondary-dark);
+    --color-accent: var(--color-accent-dark);
+    --color-border: var(--color-border-dark);
+    --color-link: var(--color-link-dark);
+}
+
+@layer utilities {
+    .no-scrollbar::-webkit-scrollbar {
+        display: none;
+    }
+
+    .no-scrollbar {
+        -ms-overflow-style: none;
+        scrollbar-width: none;
+    }
+
+    .animate-checkmark {
+        animation: draw-checkmark-in 0.3s ease forwards;
+    }
+
+    @keyframes draw-checkmark-in {
+        0% {
+            stroke-dasharray: 0 24;
+        }
+
+        100% {
+            stroke-dasharray: 24 0;
+        }
+    }
+
+    .animate-in {
+        animation: fadeIn 0.2s ease forwards;
+    }
+
+    @keyframes fadeIn {
+        0% {
+            opacity: 0;
+            transform: translateY(20px);
+        }
+
+        100% {
+            opacity: auto;
+            transform: auto
+        }
+    }
+}
