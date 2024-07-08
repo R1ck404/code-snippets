@@ -1,4 +1,4 @@
-# Code Snippets Manager
+# Code Stash
 
 This is an application developed using Tauri, React, and TypeScript. It allows users to organize their code snippets into groups and collections, with each snippet having a title, description, and the ability to contain multiple files or manually entered pieces of text.
 
