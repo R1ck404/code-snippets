@@ -10,11 +10,7 @@ This is an application developed using Tauri, React, and TypeScript. It allows u
 - Each collection can contain multiple code snippets with customizable titles and descriptions.
 - Support for editing, renaming, and deleting snippets within collections.
 - Intuitive user interface powered by React for smooth interaction.
-
-## Why no executable file?
-
-Currently, the application is in development stage with potential bugs and incomplete features. The absence of an executable ensures that users get a stable version once all major issues are resolved before a release.
-
+- 
 ## Group and Collection System
 
 The group and collection system is designed for future expansion. It paves the way for planned features like peer-to-peer collaboration, enabling users to share groups and collections with other users seamlessly.
@@ -38,3 +34,6 @@ Contributions are welcome! If you find any issues or have suggestions for improv
 ## License
 
 This project is licensed under the MIT License - see the [LICENSE](LICENSE) file for details.
+
+## Notes
+- This project is still a W.I.P project.
