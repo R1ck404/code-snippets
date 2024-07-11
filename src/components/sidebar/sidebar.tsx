@@ -11,10 +11,13 @@ import { Separator } from '../separator/separator';
 import { Alert, AlertTitle, AlertDescription, AlertActions } from '../alert/alert';
 import Button from '../button/button';
 import { toast } from '../toaster/toaster';
+import Input from '../input/input';
+import { Dialog } from '../dialog/dialog';
 export default function Sidebar() {
-    const { groups, setGroups, selectedGroup, setSelectedGroup, setSelectedCollection } = useAppState();
+    const { groups, setGroups, selectedGroup, setSelectedGroup, setSelectedCollection, setCollaborationSession, currentCollaborationSession } = useAppState();
     const [currentGroupAction, setCurrentGroupAction] = useState<string>('');
     const [profileMenuOpen, setProfileMenuOpen] = useState(false);
+    const [visible, setVisible] = useState(false);
 
     const getGroups = async () => {
         const groups = await invoke('get_groups');
@@ -44,6 +47,18 @@ export default function Sidebar() {
         });
     }
 
+    const joinSession = async (e: React.FormEvent<HTMLFormElement>) => {
+        e.preventDefault();
+
+        const formData = new FormData(e.target as HTMLFormElement);
+        const sessionId = formData.get('session_id') as string;
+
+        setCollaborationSession({
+            sessionId,
+            isCreator: false
+        });
+    }
+
     return (
         <aside className="flex flex-col p-2 items-center bg-[#1e1f21] w-fit h-screen border-r border-r-zinc-800">
             <Alert open={currentGroupAction !== ''} onClose={setIsOpen} outline={false} className='text-white'>
@@ -56,6 +71,16 @@ export default function Sidebar() {
                     <Button variant="default" color='rose' onClick={() => deleteGroup(currentGroupAction)}>Delete</Button>
                 </AlertActions>
             </Alert>
+
+            <Dialog open={visible} onClose={setVisible}>
+                <h1 className="text-white text-lg font-semibold mb-2">Join Session</h1>
+                <form className="flex flex-col space-y-2" onSubmit={joinSession}>
+                    <Input type="text" placeholder="Session ID" name="session_id" required minLength={1} maxLength={25} />
+
+                    <Button type="submit" color="dark/zinc" className="w-full">Join</Button>
+                </form>
+            </Dialog>
+
             <div className="flex space-x-2">
                 <div className="w-3 h-3 rounded-full bg-red-500 cursor-pointer" onClick={() => {
                     appWindow.close();
@@ -115,8 +140,51 @@ export default function Sidebar() {
                             <DropdownHeading className="font-semibold !pt-0">Not supported</DropdownHeading>
                         </DropdownSection>
                         <DropdownDivider className="w-[90%] mx-auto !my-0" />
+                        {currentCollaborationSession && currentCollaborationSession.sessionId && (
+                            <>
+                                <DropdownSection className="w-auto">
+                                    <DropdownLabel className="text-nowrap w-fit px-2 -mb-2">Session ({currentCollaborationSession.sessionId})</DropdownLabel>
+                                    {currentCollaborationSession.isCreator && (
+                                        <>
+                                            <DropdownItem className="text-white">Copy session id</DropdownItem>
+                                            <DropdownItem onClick={() => {
+                                                setCollaborationSession(null);
+                                                toast.success('Session ended');
+                                            }}>End session</DropdownItem>
+                                        </>
+                                    )}
+
+                                    {!currentCollaborationSession.isCreator && (
+                                        <DropdownItem onClick={() => {
+                                            setCollaborationSession(null);
+                                            toast.success('Session left');
+                                        }}>Leave session</DropdownItem>
+                                    )}
+                                </DropdownSection>
+                                <DropdownDivider className="w-[90%] mx-auto !my-0" />
+                            </>
+                        )}
                         <DropdownSection className='text-white'>
-                            <DropdownItem>Share session</DropdownItem>
+                            {!currentCollaborationSession && (
+                                <>
+                                    <DropdownItem onClick={() => {
+                                        setProfileMenuOpen(false);
+                                        const randomSessionId = Math.random().toString(36).substring(7);
+                                        setCollaborationSession({
+                                            sessionId: randomSessionId,
+                                            group: selectedGroup as Group,
+                                            isCreator: true
+                                        });
+
+                                        toast.success('Session id: ' + randomSessionId);
+                                    }}>Share session</DropdownItem>
+                                    <DropdownItem onClick={() => {
+                                        setProfileMenuOpen(false);
+                                        setVisible(true);
+                                    }}>Join session</DropdownItem>
+                                </>
+                            )}
+
                             <DropdownItem>My profile</DropdownItem>
                             <DropdownItem >Logout</DropdownItem>
                         </DropdownSection>

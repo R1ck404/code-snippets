@@ -1,5 +1,5 @@
 import React, { useState, DragEvent, ChangeEvent } from "react";
-import { useAppState } from "../../context/AppStateContext";
+import { Collection, useAppState } from "../../context/AppStateContext";
 import Button from "../button/button";
 import Input from "../input/input";
 import { invoke } from "@tauri-apps/api/tauri";
@@ -11,7 +11,7 @@ interface FileData {
 }
 
 const CreateSnippetPage: React.FC = () => {
-    const { isCreatingSnippet, setIsCreatingSnippet, selectedGroup, selectedCollection } = useAppState();
+    const { isCreatingSnippet, setIsCreatingSnippet, selectedGroup, selectedCollection, setCollections } = useAppState();
     const [isDragging, setIsDragging] = useState<boolean>(false);
     const [files, setFiles] = useState<FileData[]>([]);
     const [manualEntries, setManualEntries] = useState<string[]>([""]);
@@ -86,12 +86,28 @@ const CreateSnippetPage: React.FC = () => {
             setIsCreatingSnippet(false);
             toast.success('Snippet created successfully');
 
-            selectedCollection?.snippets.push({
-                name,
-                description,
-                files: snippets,
-                updated_by: 'user',
-                updated_at: new Date().toISOString(),
+            // selectedCollection?.snippets.push({
+            //     name,
+            //     description,
+            //     files: snippets,
+            //     updated_by: 'user',
+            //     updated_at: new Date().toISOString(),
+            // });
+
+            setCollections((prevCollections: Collection[]) => {
+                const updatedCollections = prevCollections.map((collection) => {
+                    if (collection.name === selectedCollection?.name) {
+                        collection.snippets.push({
+                            name,
+                            description,
+                            files: snippets,
+                            updated_by: 'user',
+                            updated_at: new Date().toISOString(),
+                        });
+                    }
+                    return collection;
+                });
+                return updatedCollections;
             });
         }).catch((e) => {
             toast.error('An error occurred while creating the snippet');

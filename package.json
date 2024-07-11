@@ -17,7 +17,9 @@
     "date-fns": "^3.6.0",
     "react": "^18.2.0",
     "react-dom": "^18.2.0",
-    "tailwind-scrollbar": "^3.1.0"
+    "tailwind-scrollbar": "^3.1.0",
+    "y-webrtc": "^10.3.0",
+    "yjs": "^13.6.18"
   },
   "devDependencies": {
     "@tauri-apps/cli": "^1",

@@ -23,11 +23,11 @@ export default function SnippetView() {
         const collections = await invoke('get_collections');
 
         setCollections(collections as Collection[]);
-        console.log(collections);
     }
 
     const deleteSnippet = async (snippetName: string) => {
         setIsOpen(false);
+
         await invoke('delete_snippet', { groupName: selectedGroup?.name, collectionName: selectedCollection?.name, snippetName: snippetName }).then((e) => {
             if (e && (e as string).startsWith('Error')) {
                 toast.error(e as string);

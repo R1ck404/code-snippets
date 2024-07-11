@@ -21,6 +21,12 @@ interface CodeSnippet {
     updated_at: string;
 }
 
+interface CollaborationSession {
+    sessionId: string;
+    group?: Group | null;
+    isCreator: boolean;
+}
+
 interface AppStateContextType {
     groups: Group[];
     collections: Collection[];
@@ -28,12 +34,14 @@ interface AppStateContextType {
     selectedCollection: Collection | null;
     selectedSnippet: CodeSnippet | null;
     isCreatingSnippet: boolean;
+    currentCollaborationSession: CollaborationSession | null;
     setGroups: (groups: Group[]) => void;
     setCollections: (collections: Collection[]) => void;
     setSelectedGroup: (group: Group | null) => void;
     setSelectedCollection: (collection: Collection | null) => void;
     setSelectedSnippet: (snippet: CodeSnippet | null) => void;
     setIsCreatingSnippet: (isCreatingSnippet: boolean) => void;
+    setCollaborationSession: (collaborationSession: CollaborationSession | null) => void;
 }
 
 const AppStateContext = createContext<AppStateContextType | undefined>(undefined);
@@ -45,6 +53,7 @@ export const AppStateProvider = ({ children }: { children: ReactNode }) => {
     const [selectedCollection, setSelectedCollection] = useState<Collection | null>(null);
     const [selectedSnippet, setSelectedSnippet] = useState<CodeSnippet | null>(null);
     const [isCreatingSnippet, setIsCreatingSnippet] = useState(false);
+    const [currentCollaborationSession, setCollaborationSession] = useState<CollaborationSession | null>(null);
 
     return (
         <AppStateContext.Provider
@@ -55,12 +64,14 @@ export const AppStateProvider = ({ children }: { children: ReactNode }) => {
                 selectedCollection,
                 selectedSnippet,
                 isCreatingSnippet,
+                currentCollaborationSession,
                 setGroups,
                 setCollections,
                 setSelectedGroup,
                 setSelectedCollection,
                 setSelectedSnippet,
-                setIsCreatingSnippet
+                setIsCreatingSnippet,
+                setCollaborationSession
             }}
         >
             {children}
