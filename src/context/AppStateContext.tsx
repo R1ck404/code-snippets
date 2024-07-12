@@ -35,6 +35,8 @@ interface AppStateContextType {
     selectedSnippet: CodeSnippet | null;
     isCreatingSnippet: boolean;
     currentCollaborationSession: CollaborationSession | null;
+    appTheme: 'light' | 'dark';
+    layoutStyle: 'standard' | 'floating';
     setGroups: (groups: Group[]) => void;
     setCollections: (collections: Collection[]) => void;
     setSelectedGroup: (group: Group | null) => void;
@@ -42,6 +44,8 @@ interface AppStateContextType {
     setSelectedSnippet: (snippet: CodeSnippet | null) => void;
     setIsCreatingSnippet: (isCreatingSnippet: boolean) => void;
     setCollaborationSession: (collaborationSession: CollaborationSession | null) => void;
+    setAppTheme: (theme: 'light' | 'dark') => void;
+    setLayoutStyle: (layoutStyle: 'standard' | 'floating') => void;
 }
 
 const AppStateContext = createContext<AppStateContextType | undefined>(undefined);
@@ -54,6 +58,8 @@ export const AppStateProvider = ({ children }: { children: ReactNode }) => {
     const [selectedSnippet, setSelectedSnippet] = useState<CodeSnippet | null>(null);
     const [isCreatingSnippet, setIsCreatingSnippet] = useState(false);
     const [currentCollaborationSession, setCollaborationSession] = useState<CollaborationSession | null>(null);
+    const [appTheme, setAppTheme] = useState<'light' | 'dark'>('light');
+    const [layoutStyle, setLayoutStyle] = useState<'standard' | 'floating'>('standard');
 
     return (
         <AppStateContext.Provider
@@ -65,13 +71,17 @@ export const AppStateProvider = ({ children }: { children: ReactNode }) => {
                 selectedSnippet,
                 isCreatingSnippet,
                 currentCollaborationSession,
+                appTheme,
+                layoutStyle,
                 setGroups,
                 setCollections,
                 setSelectedGroup,
                 setSelectedCollection,
                 setSelectedSnippet,
                 setIsCreatingSnippet,
-                setCollaborationSession
+                setCollaborationSession,
+                setAppTheme,
+                setLayoutStyle,
             }}
         >
             {children}

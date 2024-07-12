@@ -14,7 +14,7 @@ import * as Y from "yjs"
 import { WebrtcProvider } from "y-webrtc"
 
 function App() {
-    const { isCreatingSnippet, setIsCreatingSnippet, currentCollaborationSession, groups, setGroups, collections, setCollections } = useAppState();
+    const { isCreatingSnippet, setIsCreatingSnippet, currentCollaborationSession, groups, setGroups, collections, setCollections, appTheme, layoutStyle } = useAppState();
     const [isFullScreen, setIsFullScreen] = useState(false);
     const [rtcProvider, setRtcProvider] = useState<WebrtcProvider | null>(null);
     const isInitialSync = useRef(true);
@@ -127,17 +127,19 @@ function App() {
                 ></div>
             </div>
 
-            <section className="flex flex-col w-full h-screen bg-[#131415]">
-                <Navbar />
-                <div className="flex h-full overflow-y-hidden ">
-                    <SnippetList />
-                    {isCreatingSnippet && (
-                        <CreateSnippetPage />
-                    )}
+            <section className="flex flex-col w-full h-screen bg-[#1e1f21]">
+                <div className={`flex flex-col h-full overflow-hidden bg-[#131415] ${layoutStyle === "floating" ? "rounded-lg m-1.5 w-[calc(100%-.75rem)]" : "w-full "}`}>
+                    <Navbar />
+                    <div className="flex h-full overflow-y-hidden ">
+                        <SnippetList />
+                        {isCreatingSnippet && (
+                            <CreateSnippetPage />
+                        )}
 
-                    {!isCreatingSnippet && (
-                        <SnippetView />
-                    )}
+                        {!isCreatingSnippet && (
+                            <SnippetView />
+                        )}
+                    </div>
                 </div>
             </section>
         </main>

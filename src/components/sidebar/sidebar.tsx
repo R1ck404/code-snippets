@@ -13,11 +13,13 @@ import Button from '../button/button';
 import { toast } from '../toaster/toaster';
 import Input from '../input/input';
 import { Dialog } from '../dialog/dialog';
+import { Sheet } from '../sheet/sheet';
 export default function Sidebar() {
-    const { groups, setGroups, selectedGroup, setSelectedGroup, setSelectedCollection, setCollaborationSession, currentCollaborationSession } = useAppState();
+    const { groups, setGroups, selectedGroup, setSelectedGroup, setSelectedCollection, setCollaborationSession, currentCollaborationSession, setAppTheme, setLayoutStyle, layoutStyle, appTheme } = useAppState();
     const [currentGroupAction, setCurrentGroupAction] = useState<string>('');
     const [profileMenuOpen, setProfileMenuOpen] = useState(false);
     const [visible, setVisible] = useState(false);
+    const [isSettingsOpen, setSettingsOpen] = useState(false);
 
     const getGroups = async () => {
         const groups = await invoke('get_groups');
@@ -80,6 +82,38 @@ export default function Sidebar() {
                     <Button type="submit" color="dark/zinc" className="w-full">Join</Button>
                 </form>
             </Dialog>
+
+            <Sheet isOpen={isSettingsOpen} onClose={() => setSettingsOpen(false)}>
+                <div className="flex flex-col m-3">
+                    <h1 className="text-white text-lg font-semibold mb-2">Settings</h1>
+                    <Separator />
+                    <div className="flex flex-col items-center justify-between mt-2 space-y-4">
+                        <div className="w-full">
+                            <p className="text-white">Theme</p>
+                            <div className="flex space-x-1 mt-1 bg-neutral-900 rounded-lg p-1 w-full text-sm">
+                                <button className={`px-2 py-1 h-fit rounded-md text-zinc-200 font-semibold w-full ${appTheme === "dark" ? 'bg-zinc-800' : 'bg-zinc-900'}`} onClick={
+                                    () => setAppTheme('dark')
+                                }>Dark</button>
+                                <button className={`px-2 py-1 h-fit rounded-md bg-zinc-800 text-zinc-200 font-semibold w-full ${appTheme === "light" ? 'bg-zinc-800' : 'bg-zinc-900'}`} onClick={
+                                    () => setAppTheme('light')
+                                }>Light</button>
+                            </div>
+                        </div>
+
+                        <div className="w-full mt-2">
+                            <p className="text-white">Layout</p>
+                            <div className="flex space-x-1 mt-1 bg-neutral-900 rounded-lg p-1 w-full text-sm">
+                                <button className={`px-2 py-1 h-fit rounded-md text-zinc-200 font-semibold w-full ${layoutStyle === "standard" ? 'bg-zinc-800' : 'bg-zinc-900'}`} onClick={
+                                    () => setLayoutStyle('standard')
+                                }>Standard</button>
+                                <button className={`px-2 py-1 h-fit rounded-md bg-zinc-800 text-zinc-200 font-semibold w-full ${layoutStyle === "floating" ? 'bg-zinc-800' : 'bg-zinc-900'}`} onClick={
+                                    () => setLayoutStyle('floating')
+                                }>Floating</button>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </Sheet>
 
             <div className="flex space-x-2">
                 <div className="w-3 h-3 rounded-full bg-red-500 cursor-pointer" onClick={() => {
@@ -185,8 +219,11 @@ export default function Sidebar() {
                                 </>
                             )}
 
+                            <DropdownItem onClick={() => {
+                                setProfileMenuOpen(false);
+                                setSettingsOpen(true);
+                            }}>Settings</DropdownItem>
                             <DropdownItem>My profile</DropdownItem>
-                            <DropdownItem >Logout</DropdownItem>
                         </DropdownSection>
                     </DropdownMenu>
                 </Dropdown>

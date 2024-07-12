@@ -2,7 +2,7 @@ import { useEffect, useState } from "react";
 import { Collection, Group, useAppState } from "../../context/AppStateContext";
 import { CreateSnippetButton } from "./create-snippet-button";
 
-export default function Navbar() {
+export default function Navbar({ className }: { className?: string }) {
     const { selectedCollection, selectedGroup, selectedSnippet, collections, groups, setSelectedCollection, setSelectedGroup, setSelectedSnippet } = useAppState();
     const [searchTerm, setSearchTerm] = useState<string>("");
     const [isFocused, setIsFocused] = useState<boolean>(false);
@@ -45,7 +45,7 @@ export default function Navbar() {
     }, []);
 
     return (
-        <nav className="flex justify-between items-center h-14 w-full px-4 border-b border-b-zinc-800">
+        <nav className={`flex justify-between items-center h-14 w-full px-4 border-b border-b-zinc-800 ${className ?? ''}`}>
             <div className={`absolute top-0 left-0 w-screen h-screen bg-black/50 transition-opacity ${isFocused ? "visible opacity-100" : "invisible opacity-0"}`} onClick={() => setIsFocused(false)}></div>
             <div className="relative text-zinc-500 w-full h-auto"
                 onFocus={() => setIsFocused(true)}
